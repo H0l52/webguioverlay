@@ -10,6 +10,16 @@ To get a pre-combiled binary (made with pyinstaller), go to the releases tab in 
 
 Otherwise you can clone the repository and build it for yourself!
 
+Installer command is `pyinstaller webguioverlay.py --onefile --hidden-import=pywintypes`
+
 ## HowTo
 
-<Coming Soon>
+Make a folder in the directory of the program, and call it `gui`.
+
+Run the program.
+
+In the command line type `addelement`
+
+Run through the setup process.
+
+Type `help` to see the other commands
