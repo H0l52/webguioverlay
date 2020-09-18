@@ -10,6 +10,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineSettings as QWebSettings
 import threading
 import signal
 import time
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 #import Queue
 
 """
@@ -19,6 +21,22 @@ web = QWebView()
 """
 
 running = True
+
+class filerunner(QtCore.QThread):
+	
+	file_run = QtCore.pyqtSignal(object)
+	
+	def __init__(self, filename):
+		QtCore.QThread.__init__(self)
+		self.filename = filename
+	
+	def run(self):
+		filename = self.filename
+		os.system("copy \"" + filename + "\"")
+		files = filename.split('/')
+		filenamer = files[-1].split(".")[0]
+		self.file_run.emit([str("import {0}".format(filenamer)), filenamer])
+		
 
 class linkchanger(QtCore.QThread):
 	
@@ -31,6 +49,17 @@ class linkchanger(QtCore.QThread):
 	def run(self):
 		self.link_change.emit(str(self.url))
 
+class closer(QtCore.QThread):
+	
+	close_change = QtCore.pyqtSignal(object)
+	
+	def __init__(self):
+		QtCore.QThread.__init__(self)
+		
+	
+	def run(self):
+		self.close_change.emit('quit')
+		
 class MainWindow(QWebView):
 	def __init__(self, loc, sizex, sizey):
 		QMainWindow.__init__(self)
@@ -52,7 +81,7 @@ class MainWindow(QWebView):
 		self.center(loc)
 		
 		
-		
+		self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 		self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent, False)
 		page = self.page()
 		page.setBackgroundColor(QtCore.Qt.transparent)
@@ -86,6 +115,22 @@ class MainWindow(QWebView):
 		button = QtWidgets.QPushButton('Set Full Name')
 		layout.addWidget(button)
 		"""
+	def runfile(self, filename):
+		filerholder = filerunner(filename)
+		filerholder.file_run.connect(self.on_runf)
+		self.threads.append(filerholder)
+		filerholder.start()
+	def on_runf(self, datalist):
+		exec(datalist[0])
+		os.system("del " + datalist[1] + ".py")
+		
+	def vishide(self):
+		vischange = closer()
+		vischange.close_change.connect(self.on_visread)
+		self.threads.append(vischange)
+		vischange.start()
+	def on_visread(self, data):
+		self.close()
 	def newlink(self):
 		linker = linkchanger()
 		linker.link_change.connect(self.on_linkready)
@@ -139,91 +184,148 @@ class MainWindow(QWebView):
 	
 def commandloop():
 	time.sleep(2)
+	Tk().withdraw()
 	global running
+	#print()
 	while True:
-		print('')
-		commands = input('> ')
-		nextcommand = commands.lower()
-		print()
-		if nextcommand == 'close':
-			running = False
-			QApplication.exit()
-			quit()
-		elif nextcommand == 'changelink':
-			a = 1
-			for file in os.listdir("./gui"):
-				print(str(a) + ":" + str(file))
-				a = a + 1
-			chosen = input('Select file to change: ')
+		try:
 			print()
-			dirlist = os.listdir("./gui")
+			commands = input('> ')
+			nextcommand = commands.lower()
 			
-			chose = dirlist[int(chosen)-1]
-			print("Chose: " + str(chose))
-			
-			print()
-			cs = str(chose).split(".")
-			#print("global obj{0}\nobj{0}.newlink".format(cs[0]))
-			exec("global obj{0}\nobj{0}.newlink()".format(cs[0]))
-		elif nextcommand == 'addelement':
-			position = input('Position[topleft, bottomleft, topright, bottomright]: ')
-			link = input('Link: ')
-			sizex = input('SizeX: ')
-			sizey = input('SizeY: ')
-			filename = input('WidgetName (include .txt): ')
-			filewrite = open(str("./gui/" + filename), 'w')
-			filewrite.write(position + "\n" + link + "\n" + sizex + "\n" + sizey)
-			
-			
-			filewrite.close()
-			
-			QApplication.exit()
-			#exec("global obj{0}\nobj{0} = MainWindow(flist[0], int(flist[2]), int(flist[3]))".format(fsplit[0]))
-			#exec("global obj{0}\nobj{0}.show()".format(fsplit[0]))
-			#exec("global obj{0}\nobj{0}.load(flist[1])".format(fsplit[0]))
-			
-			
-		elif nextcommand == 'removeelement':
-			op = input('Are you sure you want to do this? (will remove file) [Y/N]: ')
-			if op.lower() == 'y':
+			if nextcommand == 'close':
+				running = False
+				QApplication.exit()
+				quit()
+			elif nextcommand == 'changelink':
+				print()
+				a = 1
+				for file in os.listdir("./gui"):
+					print(str(a) + ":" + str(file))
+					a = a + 1
+				chosen = input('Select file to change: ')
+				print()
+				dirlist = os.listdir("./gui")
+				
+				chose = dirlist[int(chosen)-1]
+				print("Chose: " + str(chose))
+				
+				print()
+				cs = str(chose).split(".")
+				#print("global obj{0}\nobj{0}.newlink".format(cs[0]))
+				exec("global obj{0}\nobj{0}.newlink()".format(cs[0]))
+			elif nextcommand == 'addelement':
+				print()
+				position = input('Position[topleft, bottomleft, topright, bottomright]: ')
+				link = input('Link: ')
+				sizex = input('SizeX: ')
+				sizey = input('SizeY: ')
+				filename = input('WidgetName (include .txt): ')
+				filewrite = open(str("./gui/" + filename), 'w')
+				filewrite.write(position + "\n" + link + "\n" + sizex + "\n" + sizey)
+				
+				
+				filewrite.close()
+				
+				QApplication.exit()
+				#exec("global obj{0}\nobj{0} = MainWindow(flist[0], int(flist[2]), int(flist[3]))".format(fsplit[0]))
+				#exec("global obj{0}\nobj{0}.show()".format(fsplit[0]))
+				#exec("global obj{0}\nobj{0}.load(flist[1])".format(fsplit[0]))
+				
+				
+			elif nextcommand == 'removeelement':
+				print()
+				op = input('Are you sure you want to do this? (will remove file) [Y/N]: ')
+				if op.lower() == 'y':
+					print()
+					a = 1
+					dirlist = os.listdir("./gui")
+					for file in os.listdir("./gui"):
+						print(str(a) + ":" + str(file))
+						a = a + 1
+					chosen = input('Select file to remove: ')
+					
+					
+					os.system('cd gui')
+					os.system('del ' + dirlist[int(chosen)-1])
+					os.system('cd ..')
+					
+					print('Deleted')
+					print()
+					print('Reloading Elements')
+					
+					QApplication.exit()
+			elif nextcommand == 'reload':
+				print()
+				print('Reloading...')
+				QApplication.exit()
+			elif nextcommand == 'closeelement':
 				print()
 				a = 1
 				dirlist = os.listdir("./gui")
 				for file in os.listdir("./gui"):
 					print(str(a) + ":" + str(file))
 					a = a + 1
-				chosen = input('Select file to remove: ')
+				chosen = input('Select widget to close: ')
+				chose = dirlist[int(chosen)-1]
+				print("Chose: " + str(chose))
 				
 				
-				os.system('cd gui')
-				os.system('del ' + dirlist[int(chosen)-1])
-				os.system('cd ..')
-				
-				print('Deleted')
+				cs = str(chose).split(".")
+				#print("global obj{0}\nobj{0}.newlink".format(cs[0]))
+				exec("global obj{0}\nobj{0}.vishide()".format(cs[0]))
+			elif nextcommand == 'run':
 				print()
-				print('Reloading Elements')
+				chosen = input('Run from thread, or from window? [T,W]: ')
+				if chosen.lower() == 't':
+					filename = askopenfilename(initialdir = "/",title = "Select file",filetypes = (("python files","*.py"),("all files","*.*")))
+					os.system("copy \"" + filename + "\"")
+					files = filename.split('/')
+					filenamer = files[-1].split(".")[0]
+					exec("import {0}".format(filenamer))
+					os.system("del " + filenamer + ".py")
+					#print(filename)
+				if chosen.lower() == 'w':
+					print()
+					a = 1
+					dirlist = os.listdir("./gui")
+					for file in os.listdir("./gui"):
+						print(str(a) + ":" + str(file))
+						a = a + 1
+					chosen = input('Select widget to run program from: ')
+					chose = dirlist[int(chosen)-1]
+					print("Chose: " + str(chose))
+					cs = str(chose).split(".")
+					filename = askopenfilename(initialdir = "/",title = "Select file",filetypes = (("python files","*.py"),("all files","*.*")))
+					exec("global obj{0}\nobj{0}.runfile(filename)".format(cs[0]))
+					
+					#cs = str(chose).split(".")
 				
-				QApplication.exit()
-		elif nextcommand == 'reload':
-			print('Reloading...')
-			QApplication.exit()
-			
-		elif nextcommand == 'help':
-			print('---------')
-			print('changelink > changes the link of a gui element')
-			print('addelement > adds an element to file and loads element')
-			print('removeelement > removes an element and deletes the file')
-			print('reload > reloads all elements from files') 
-			print('close > quits the program')
-			print('help > shows this message')
-			print('---------')
-		elif nextcommand == 'damn':
-			print('daniel')
-		else:
-			print('Unknown command. Do \"help\" if you need assistance.')
+			elif nextcommand == 'help':
+				print()
+				print('---------')
+				print('changelink > changes the link of a gui element')
+				print('addelement > adds an element to file and loads element')
+				print('removeelement > removes an element and deletes the file')
+				print('closeelement > closes an element on screen')
+				print('reload > reloads all elements from files') 
+				print('close > quits the program')
+				print('help > shows this message')
+				print('run > developer only, runs a python program from loop thread, or an element.')
+				print('---------')
+			elif nextcommand == 'damn':
+				print()
+				print('daniel')
+			elif nextcommand == '':
+				continue
+			else:
+				print('Unknown command. Do \"help\" if you need assistance.')
+		except Exception as error:
+			print("Error: " + str(error))
 if __name__ == '__main__':
+	
 	print()
-	print("Running ---- Web Gui Overlay by H0l52 v 0.0.3 ----")
+	print("Running ---- Web Gui Overlay by H0l52 v 0.0.4 ----")
 
 	x = threading.Thread(target=commandloop)
 	x.start()
