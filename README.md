@@ -25,3 +25,17 @@ In the command line type `addelement`
 Run through the setup process.
 
 Type `help` to see the other commands
+
+Example:
+
+I went to [streamkit.discord.com/overlay](https://streamkit.discord.com/overlay)
+and choose OBS.
+
+I then configured the voice widget to my liking and grabbed the link.
+
+In the Web Gui Overlay program i run `addelement` and I choose `topleft` as my position
+Then I enter the link I got from the discord streamkit.
+Then I choose a SizeX of 312
+And I choose a SizeY of 600
+
+Now when I join the voice chat I setup in the discord streamkit, I can see who is speaking as an overlay on my screen.
