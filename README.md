@@ -4,6 +4,8 @@ A easily customize-able GUI overlay that goes over the computer desktop.
 This project uses the pywin32 library (go check them out [HERE](https://github.com/mhammond/pywin32)!)
 And it uses the pyqt5 libraries. To install these do `pip install PyQt5 PyQtWebEngine`.
 
+It uses Tkinter for the `run` command.
+
 ## Downloads
 
 To get a pre-combiled binary (made with pyinstaller), go to the [releases tab in GitHub.](https://github.com/H0l52/webguioverlay/releases)
