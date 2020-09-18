@@ -6,7 +6,7 @@ And it uses the pyqt5 libraries. To install these do `pip install PyQt5 PyQtWebE
 
 ## Downloads
 
-To get a pre-combiled binary (made with pyinstaller), go to the releases tab in GitHub.
+To get a pre-combiled binary (made with pyinstaller), go to the [releases tab in GitHub.](https://github.com/H0l52/webguioverlay/releases)
 
 Otherwise you can clone the repository and build it for yourself!
 
