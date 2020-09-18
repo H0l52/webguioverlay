@@ -196,7 +196,7 @@ def commandloop():
 			if nextcommand == 'close':
 				running = False
 				QApplication.exit()
-				quit()
+				sys.exit()
 			elif nextcommand == 'changelink':
 				print()
 				a = 1
