@@ -1,0 +1,82 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#Flash {
+	background-color: red;
+	opacity: 0.15;
+	transition: opacity 1s;
+}
+
+#Flash.fade {
+	opacity: 0;
+}
+
+.muteico {
+	color: white;
+	stroke: white;
+	width: 5em;
+	height: 5em;
+
+}
+
+
+
+
+.hidden {
+	opacity: 0;
+}
+
+.shown {
+	opacity: 1;
+}
+
+.nomute {
+	position: absolute;
+	z-index: -2;
+}
+
+.mute {
+	position: absolute;
+	z-index: -3;
+}
+
+#togglemute {
+	z-index: 30;
+	border-width: 0px;
+	width: 5em;
+	height: 5em;
+	background-color: transparent;
+	justify-content: center;
+	display: flex;
+	position: relative;
+	cursor: pointer;
+	outline:none;
+}
+
+
+.footer {
+	display: flex;
+	position: absolute;
+	z-index: 3;
+	justify-content: center;
+	align-items: center;
+	align-items: flex-end;
+	width: 100%;
+	height: 95%;
+}
+
+
+.footer a {
+	color: grey;
+	text-decoration: none;
+}
+
+.abutton {
+	z-index: 30;
+	border-width: 0px;
+	background-color: transparent;
+	cursor: pointer;
+	outline:none;
+}
